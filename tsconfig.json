@@ -1,0 +1,21 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "noImplicitAny": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "experimentalDecorators": true,
+    "forceConsistentCasingInFileNames": true,
+    "lib": ["es2018", "dom"],
+    "target": "es5",
+    "sourceMap": true,
+    "resolveJsonModule": true,
+    "noEmit": true,
+    "allowJs": false,
+    "downlevelIteration": true,
+    "strictNullChecks": true,
+    "jsx": "react"
+  },
+  "exclude": ["node_modules"]
+}

@@ -10,10 +10,11 @@ export class Player implements StageElement {
     public readonly id: StageId = StageId.PLAYER;
     private readonly player: GameComponent = new GameComponent(100, 40, 200, 0, "cyan", v4());
     private context: CanvasRenderingContext2D;
-    private GAME_BOUNDS: DOMRect;
     private RIGHT: boolean = false;
     private LEFT: boolean = false;
     private SPEED: number = 12.5;
+
+    public constructor(private readonly GAME_BOUNDS: DOMRect) {}
 
     public update(): void {
         updateGameComponent(this.context, this.player);
@@ -35,7 +36,6 @@ export class Player implements StageElement {
 
     public setContext(context: CanvasRenderingContext2D): void {
         this.context = context;
-        this.GAME_BOUNDS = this.context.canvas.getBoundingClientRect();
         this.player.updatePosition(this.player.x, this.GAME_BOUNDS.height - this.player.height);
         this.addListeners();
     }

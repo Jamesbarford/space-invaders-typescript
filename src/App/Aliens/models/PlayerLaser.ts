@@ -7,14 +7,14 @@ export class PlayerLaser implements StageElement {
     public readonly id = StageId.LASER;
     private context: CanvasRenderingContext2D;
     private laser: Maybe<GameComponent>;
-    private GAME_BOUNDS: DOMRect;
     public x: number;
     public y: number;
     public width: number;
 
+    public constructor(private readonly GAME_BOUNDS: DOMRect) {}
+
     public setContext(context: CanvasRenderingContext2D): void {
         this.context = context;
-        this.GAME_BOUNDS = this.context.canvas.getBoundingClientRect();
     }
 
     public update(): void {

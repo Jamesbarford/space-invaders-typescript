@@ -7,18 +7,23 @@ import { GameComponent } from "./GameComponent";
 import { updateGameComponent } from "../../../lib/gameUtil";
 import { PlayerLaser } from "./PlayerLaser";
 import { LaserHit } from "./LaserHit";
+import { Directions } from "./Directions";
 
 export class AlienRows implements StageElement {
     private context: CanvasRenderingContext2D;
     public id: StageId = StageId.ALIENS;
-    private dir: "left" | "right" = "right";
-    private GAME_BOUNDS: DOMRect;
+    private dir: Directions = Directions.RIGHT;
+    private SPEED: number = 1;
 
-    public constructor(private alienRows: Map<number, List<GameComponent>>) {}
+    public constructor(
+        private alienRows: Map<number, List<GameComponent>>,
+        private readonly GAME_BOUNDS: DOMRect
+    ) {
+        this.changeXPosition = this.changeXPosition.bind(this);
+    }
 
     public setContext(context: CanvasRenderingContext2D): void {
         this.context = context;
-        this.GAME_BOUNDS = this.context.canvas.getBoundingClientRect();
         this.moveLoop();
     }
 
@@ -42,19 +47,14 @@ export class AlienRows implements StageElement {
 
         this.alienRows.forEach((row, rowId) =>
             row.forEach(gameComponent => {
-                const horizontallyNear: boolean = inRange(
-                    laser.x + laser.width,
-                    gameComponent.x,
-                    gameComponent.x + gameComponent.width
-                );
-
-                const verticallyNear: boolean = inRange(
-                    laser.y + laser.width,
-                    gameComponent.y,
-                    gameComponent.y + gameComponent.height
-                );
-
-                if (horizontallyNear && verticallyNear) laserHit = new LaserHit(gameComponent, rowId);
+                const { x, y, width, height } = gameComponent;
+                if (
+                    inRange(laser.x + laser.width, x, x + width) &&
+                    inRange(laser.y + laser.width, y, y + height)
+                ) {
+                    laserHit = new LaserHit(gameComponent, rowId);
+                    return false;
+                }
             })
         );
 
@@ -63,25 +63,34 @@ export class AlienRows implements StageElement {
 
     private moveLoop(): void {
         let prevDir = this.dir;
-        if (this.dir === "right") {
-            this.alienRows.forEach(row =>
-                row.forEach(c => {
-                    const newX = (c.x += 1);
-                    if (newX + 40 >= this.GAME_BOUNDS.right - 5) this.dir = "left";
-                    c.updatePosition(newX, c.y);
-                })
-            );
+
+        if (this.dir === Directions.RIGHT) {
+            this.alienRows.forEach(row => row.forEach(this.changeXPosition(+this.SPEED)));
         } else {
-            this.alienRows.forEach(row =>
-                row.forEach(c => {
-                    const newX = (c.x -= 1);
-                    if (newX <= this.GAME_BOUNDS.left - 5) this.dir = "right";
-                    c.updatePosition(newX, c.y);
-                })
-            );
+            this.alienRows.forEach(row => row.forEach(this.changeXPosition(-this.SPEED)));
         }
 
         if (prevDir !== this.dir) this.lowerRow();
+    }
+
+    private changeXPosition(speed: number) {
+        return (c: GameComponent): void => {
+            const newXPosition: number = (c.x += speed);
+
+            this.changeDirection(newXPosition);
+            c.updatePosition(newXPosition, c.y);
+        };
+    }
+    private changeDirection(xPosition: number) {
+        switch (this.dir) {
+            case Directions.LEFT:
+                const shouldGoRight: boolean = xPosition <= this.GAME_BOUNDS.left - 5;
+                if (shouldGoRight) this.dir = Directions.RIGHT;
+
+            case Directions.RIGHT:
+                const shouldGoLeft: boolean = xPosition + 40 >= this.GAME_BOUNDS.right - 5;
+                if (shouldGoLeft) this.dir = Directions.LEFT;
+        }
     }
 
     private lowerRow() {

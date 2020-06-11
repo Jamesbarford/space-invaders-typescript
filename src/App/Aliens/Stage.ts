@@ -14,15 +14,25 @@ export const enum StageId {
 }
 
 export class Stage {
-    private context: CanvasRenderingContext2D;
-    public stageElementMap: Map<StageId, StageElement> = Map();
     public animationId: number;
+    public stageElementMap: Map<StageId, StageElement> = Map();
+    private readonly context: CanvasRenderingContext2D;
+    private readonly GAME_BOUNDS: DOMRect;
 
     public constructor(public readonly canvas: HTMLCanvasElement) {
+        this.canvas.width = 800;
+        this.canvas.height = 500;
+        const context = this.canvas.getContext("2d");
+
+        if (context) this.context = context;
+        else throw new Error("Canvas context not found");
+
+        this.GAME_BOUNDS = canvas.getBoundingClientRect();
+
         this.updateCanvas = this.updateCanvas.bind(this);
         this.addElement = this.addElement.bind(this);
 
-        window.requestAnimationFrame(this.updateCanvas);
+        this.updateCanvas();
     }
 
     public addElement(stageElement: StageElement): void {
@@ -38,13 +48,8 @@ export class Stage {
         return this.stageElementMap.get(stageId, null);
     }
 
-    public start(): void {
-        this.canvas.width = 800;
-        this.canvas.height = 500;
-        const context = this.canvas.getContext("2d");
-
-        if (context) this.context = context;
-        else throw new Error("Canvas context not found");
+    public getGameBounds(): DOMRect {
+        return this.GAME_BOUNDS;
     }
 
     private shotDetection(): void {

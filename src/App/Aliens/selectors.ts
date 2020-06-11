@@ -5,8 +5,6 @@ import { AppState } from "../../store";
 import { AlienState } from "./reducer";
 import { aliensToComponents } from "./converters/aliensToComponents";
 import { Alien } from "./models/Alien";
-import { StageElement } from "./models/StageElement";
-import { AlienRows } from "./models/AlienRows";
 import { GameComponent } from "./models/GameComponent";
 
 export function selectAlienState() {
@@ -16,10 +14,10 @@ export function selectAlienState() {
 }
 
 export function selectAliensAsStageElement() {
-    return function (appState: AppState): StageElement {
+    return function (appState: AppState): Map<number, List<GameComponent>> {
         const alienState: AlienState = selectAlienState()(appState);
 
-        const m = Map<number, List<GameComponent>>().withMutations(map =>
+       return Map<number, List<GameComponent>>().withMutations(map =>
             map
                 .set(4, toComponents(alienState, 4, 120, "blue"))
                 .set(3, toComponents(alienState, 3, 90, "white"))
@@ -27,8 +25,6 @@ export function selectAliensAsStageElement() {
                 .set(1, toComponents(alienState, 1, 30, "white"))
                 .set(0, toComponents(alienState, 0, 0, "white"))
         );
-
-        return new AlienRows(m);
     };
 }
 

@@ -14,6 +14,9 @@ import { PlayerLaser } from "./models/PlayerLaser";
 import { AlienState, KillAlien } from "./reducer";
 import { LaserHit } from "./models/LaserHit";
 import { Alien } from "./models/Alien";
+import { List, Map } from "immutable";
+import { GameComponent } from "./models/GameComponent";
+import { AlienRows } from "./models/AlienRows";
 
 interface MapDispatchToProps {
     incrementScore(score: number): void;
@@ -21,7 +24,7 @@ interface MapDispatchToProps {
 }
 
 interface MapStateToProps {
-    alienStageElement: StageElement;
+    alienStageElement: Map<number, List<GameComponent>>;
     alienState: AlienState;
 }
 
@@ -34,9 +37,9 @@ class RenderAliens extends React.Component<RenderAliensProps> {
     public componentDidMount() {
         if (this.canvas.current) {
             this.stage = new Stage(this.canvas.current);
-            this.stage.start();
-            this.stage.addElement(this.props.alienStageElement);
-            this.stage.addElement(new Player());
+            const gameBounds = this.stage.getGameBounds();
+            this.stage.addElement(new AlienRows(this.props.alienStageElement, gameBounds));
+            this.stage.addElement(new Player(gameBounds));
         }
 
         fromEvent(document, "keydown").subscribe(e => {
@@ -63,7 +66,7 @@ class RenderAliens extends React.Component<RenderAliensProps> {
 
         if (!(player instanceof Player) || this.stage.has(StageId.LASER)) return void 0;
 
-        const laser: PlayerLaser = new PlayerLaser();
+        const laser: PlayerLaser = new PlayerLaser(this.stage.getGameBounds());
 
         this.stage.addElement(laser);
         laser.shoot(player.gameComponent);
@@ -76,10 +79,7 @@ class RenderAliens extends React.Component<RenderAliensProps> {
     public render(): JSX.Element {
         return (
             <>
-                <canvas
-                    style={{ backgroundColor: "black" }}
-                    ref={this.canvas}
-                />
+                <canvas style={{ backgroundColor: "black" }} ref={this.canvas} />
                 <button onClick={this.togglePause}>pause</button>
             </>
         );

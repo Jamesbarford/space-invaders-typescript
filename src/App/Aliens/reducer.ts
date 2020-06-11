@@ -7,11 +7,11 @@ export type AlienState = Map<number, Map<string, Alien>>;
 
 function createInitial(): AlienState {
     return Map([
-        [0, createAlienMap(2)],
-        [1, createAlienMap(2)],
+        [0, createAlienMap(4)],
+        [1, createAlienMap(3)],
         [2, createAlienMap(3)],
-        [3, createAlienMap(3)],
-        [4, createAlienMap(4)]
+        [3, createAlienMap(2)],
+        [4, createAlienMap(2)]
     ]);
 }
 

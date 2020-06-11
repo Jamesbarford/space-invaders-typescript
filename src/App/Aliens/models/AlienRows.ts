@@ -1,7 +1,7 @@
 import { List, Map } from "immutable";
 
 import { StageElement } from "./StageElement";
-import { inRange, isNil } from "../../../lib/util";
+import { inRange } from "../../../lib/util";
 import { StageId } from "../Stage";
 import { GameComponent } from "./GameComponent";
 import { updateGameComponent } from "../../../lib/gameUtil";
@@ -12,12 +12,14 @@ export class AlienRows implements StageElement {
     private context: CanvasRenderingContext2D;
     public id: StageId = StageId.ALIENS;
     private dir: "left" | "right" = "right";
+    private GAME_BOUNDS: DOMRect;
 
     public constructor(private alienRows: Map<number, List<GameComponent>>) {}
 
     public setContext(context: CanvasRenderingContext2D): void {
         this.context = context;
-        this.move();
+        this.GAME_BOUNDS = this.context.canvas.getBoundingClientRect();
+        this.moveLoop();
     }
 
     public remove(gameComponentId: string, foundRowId: number): void {
@@ -25,19 +27,14 @@ export class AlienRows implements StageElement {
             foundRowId,
             this.alienRows.get(foundRowId, List()).filter(arg => arg.id !== gameComponentId)
         );
+
+        const row: Maybe<List<GameComponent>> = this.alienRows.get(foundRowId);
+        if (row && row.isEmpty()) this.alienRows = this.alienRows.delete(foundRowId);
     }
 
     public update(): void {
         this.alienRows.forEach(row => row.forEach(c => updateGameComponent(this.context, c)));
-        this.move();
-    }
-
-    private move(): void {
-        const { firstComponent, lastComponent } = this.getFirstAndLast();
-        console.log(firstComponent, lastComponent);
-        if (!isNil(firstComponent) && !isNil(lastComponent)) {
-            this.moveLoop(firstComponent, lastComponent, this.context.canvas.getBoundingClientRect());
-        }
+        this.moveLoop();
     }
 
     public detectHit(laser: PlayerLaser): Maybe<LaserHit> {
@@ -64,27 +61,30 @@ export class AlienRows implements StageElement {
         return laserHit;
     }
 
-    private moveLoop(
-        firstComponent: GameComponent,
-        lastComponent: GameComponent,
-        domRect: DOMRect
-    ): void {
+    private moveLoop(): void {
+        let prevDir = this.dir;
         if (this.dir === "right") {
-            if (lastComponent.x + lastComponent.width >= domRect.right - 5) this.dir = "left";
-            this.alienRows.forEach(row => row.forEach(c => c.updatePosition((c.x += 1), c.y)));
+            this.alienRows.forEach(row =>
+                row.forEach(c => {
+                    const newX = (c.x += 1);
+                    if (newX + 40 >= this.GAME_BOUNDS.right - 5) this.dir = "left";
+                    c.updatePosition(newX, c.y);
+                })
+            );
         } else {
-            if (firstComponent.x <= domRect.left + 5) this.dir = "right";
-            this.alienRows.forEach(row => row.forEach(c => c.updatePosition((c.x -= 1), c.y)));
+            this.alienRows.forEach(row =>
+                row.forEach(c => {
+                    const newX = (c.x -= 1);
+                    if (newX <= this.GAME_BOUNDS.left - 5) this.dir = "right";
+                    c.updatePosition(newX, c.y);
+                })
+            );
         }
+
+        if (prevDir !== this.dir) this.lowerRow();
     }
 
-    private getFirstAndLast(): {
-        firstComponent: Maybe<GameComponent>;
-        lastComponent: Maybe<GameComponent>;
-    } {
-        return {
-            firstComponent: this.alienRows.first(List<GameComponent>()).first(null),
-            lastComponent: this.alienRows.last(List<GameComponent>()).last(null)
-        };
+    private lowerRow() {
+        this.alienRows.forEach(row => row.forEach(c => c.updatePosition(c.x, c.y + c.height / 2)));
     }
 }

@@ -21,7 +21,7 @@ export function selectAliensAsStageElement() {
 
         const m = Map<number, List<GameComponent>>().withMutations(map =>
             map
-                .set(4, toComponents(alienState, 4, 120, "white"))
+                .set(4, toComponents(alienState, 4, 120, "blue"))
                 .set(3, toComponents(alienState, 3, 90, "white"))
                 .set(2, toComponents(alienState, 2, 60, "green"))
                 .set(1, toComponents(alienState, 1, 30, "white"))

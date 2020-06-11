@@ -11,7 +11,6 @@ import { StageElement } from "./models/StageElement";
 import { Player } from "./models/Player";
 import { isSpaceBar } from "../../lib/gameUtil";
 import { PlayerLaser } from "./models/PlayerLaser";
-import { DebugComponent } from "./models/DebugComponent";
 import { AlienState, KillAlien } from "./reducer";
 import { LaserHit } from "./models/LaserHit";
 import { Alien } from "./models/Alien";

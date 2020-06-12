@@ -12,6 +12,7 @@ export class StageService {
     ) {}
 
     public addElement(stageElement: StageElement): void {
+        stageElement.setStageService(this);
         this.stageElementMap = this.stageElementMap.set(stageElement.id, stageElement);
     }
 

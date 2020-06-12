@@ -14,47 +14,15 @@ export class AlienRows implements StageElement {
     public id: StageId = StageId.ALIENS;
     private dir: Directions = Directions.RIGHT;
     private SPEED: number = 1;
+    private stageService: StageService
 
-    public constructor(
-        private alienRows: Map<number, List<GameComponent>>,
-        private readonly stageService: StageService
-    ) {
-        this.moveLoop();
+    public constructor(private alienRows: Map<number, List<GameComponent>>) {
         this.changeXPosition = this.changeXPosition.bind(this);
-    }
-
-    public remove(gameComponentId: string, foundRowId: number): void {
-        this.alienRows = this.alienRows.set(
-            foundRowId,
-            this.alienRows.get(foundRowId, List()).filter(arg => arg.id !== gameComponentId)
-        );
-
-        const row: Maybe<List<GameComponent>> = this.alienRows.get(foundRowId);
-        if (row && row.isEmpty()) this.alienRows = this.alienRows.delete(foundRowId);
     }
 
     public update(): void {
         this.alienRows.forEach(row => row.forEach(c => updateGameComponent(this.stageService.getContext(), c)));
         this.moveLoop();
-    }
-
-    public detectHit(laser: PlayerLaser): Maybe<LaserHit> {
-        let laserHit: Maybe<LaserHit> = null;
-
-        this.alienRows.forEach((row, rowId) =>
-            row.forEach(gameComponent => {
-                const { x, y, width, height } = gameComponent;
-                if (
-                    inRange(laser.x + laser.width, x, x + width) &&
-                    inRange(laser.y + laser.width, y, y + height)
-                ) {
-                    laserHit = new LaserHit(gameComponent, rowId);
-                    return false;
-                }
-            })
-        );
-
-        return laserHit;
     }
 
     private moveLoop(): void {
@@ -92,5 +60,38 @@ export class AlienRows implements StageElement {
 
     private lowerRow(): void {
         this.alienRows.forEach(row => row.forEach(c => c.updatePosition(c.x, c.y + c.height / 2)));
+    }
+
+    public setStageService(stageService: StageService): void {
+        this.stageService = stageService;
+    }
+
+    public remove(gameComponentId: string, foundRowId: number): void {
+        this.alienRows = this.alienRows.set(
+            foundRowId,
+            this.alienRows.get(foundRowId, List()).filter(arg => arg.id !== gameComponentId)
+        );
+
+        const row: Maybe<List<GameComponent>> = this.alienRows.get(foundRowId);
+        if (row && row.isEmpty()) this.alienRows = this.alienRows.delete(foundRowId);
+    }
+
+    public detectHit(laser: PlayerLaser): Maybe<LaserHit> {
+        let laserHit: Maybe<LaserHit> = null;
+
+        this.alienRows.forEach((row, rowId) =>
+            row.forEach(gameComponent => {
+                const { x, y, width, height } = gameComponent;
+                if (
+                    inRange(laser.x + laser.width, x, x + width) &&
+                    inRange(laser.y + laser.width, y, y + height)
+                ) {
+                    laserHit = new LaserHit(gameComponent, rowId);
+                    return false;
+                }
+            })
+        );
+
+        return laserHit;
     }
 }

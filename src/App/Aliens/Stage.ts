@@ -1,6 +1,3 @@
-import { Map } from "immutable";
-
-import { StageElement } from "./models/StageElement";
 import { PlayerLaser } from "./models/PlayerLaser";
 import { AlienRows } from "./models/AlienRows";
 import { LaserHit } from "./models/LaserHit";
@@ -17,7 +14,6 @@ export const enum StageId {
 
 export class Stage {
     public animationId: number;
-    public stageElementMap: Map<StageId, StageElement> = Map();
     private readonly context: CanvasRenderingContext2D;
     public readonly stageService: StageService
 
@@ -60,7 +56,6 @@ export class Stage {
         this.shotDetection();
         this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
         this.stageService.update();
-        this.stageElementMap.forEach(stageElement => stageElement.update());
         this.animationId = window.requestAnimationFrame(this.updateCanvas);
     }
 }

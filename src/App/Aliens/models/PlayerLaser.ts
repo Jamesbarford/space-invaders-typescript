@@ -10,8 +10,11 @@ export class PlayerLaser implements StageElement {
     public x: number;
     public y: number;
     public width: number;
+    private stageService: StageService;
 
-    public constructor(private readonly stageService: StageService) {}
+    public setStageService(stageService: StageService) {
+        this.stageService = stageService;
+    }
 
     public update(): void {
         if (this.laser) updateGameComponent(this.stageService.getContext(), this.laser);

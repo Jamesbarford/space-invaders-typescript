@@ -34,8 +34,8 @@ class RenderAliens extends React.Component<RenderAliensProps> {
     public componentDidMount() {
         if (this.canvas.current) {
             this.stage = new Stage(this.canvas.current);
-            this.stage.stageService.addElement(new AlienRows(this.props.alienStageElement, this.stage.stageService));
-            this.stage.stageService.addElement(new Player(this.stage.stageService));
+            this.stage.stageService.addElement(new AlienRows(this.props.alienStageElement));
+            this.stage.stageService.addElement(new Player());
         }
 
         fromEvent(window, "hit").subscribe(e => {

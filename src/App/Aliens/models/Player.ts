@@ -11,14 +11,10 @@ import { PlayerLaser } from "./PlayerLaser";
 export class Player implements StageElement {
     public readonly id: StageId = StageId.PLAYER;
     private readonly player: GameComponent = new GameComponent(100, 40, 200, 0, "cyan", v4());
+    private stageService: StageService
     private RIGHT: boolean = false;
     private LEFT: boolean = false;
     private SPEED: number = 12.5;
-
-    public constructor(private readonly stageService: StageService) {
-        this.player.updatePosition(this.player.x, this.stageService.GAME_BOUNDS.height - this.player.height);
-        this.addListeners();
-    }
 
     public update(): void {
         updateGameComponent(this.stageService.getContext(), this.player);
@@ -32,6 +28,12 @@ export class Player implements StageElement {
         if (this.RIGHT && this.player.x < this.stageService.GAME_BOUNDS.width - this.player.width) {
             return this.player.updatePosition((this.player.x += this.SPEED), this.player.y);
         }
+    }
+
+    public setStageService(stageService: StageService): void {
+        this.stageService = stageService;
+        this.player.updatePosition(this.player.x, this.stageService.GAME_BOUNDS.height - this.player.height);
+        this.addListeners();
     }
 
     private addListeners(): void {
@@ -53,7 +55,7 @@ export class Player implements StageElement {
     private shoot(): void {
         if (this.stageService.has(StageId.LASER)) return void 0;
 
-        const laser: PlayerLaser = new PlayerLaser(this.stageService);
+        const laser: PlayerLaser = new PlayerLaser();
 
         this.stageService.addElement(laser);
         laser.shoot(this.player);

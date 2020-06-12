@@ -2,19 +2,16 @@ import * as React from "react";
 import { connect } from "react-redux";
 import { createStructuredSelector } from "reselect";
 import { fromEvent } from "rxjs";
+import { List, Map } from "immutable";
 
-import { Stage, StageId } from "./Stage";
+import { Stage } from "./Stage";
 import { IncrementScore } from "../Score/reducer";
 import { selectAliensAsStageElement, selectAlienState } from "./selectors";
-import { AppState } from "../../store";
-import { StageElement } from "./models/StageElement";
+import { AppState } from "../../store";;
 import { Player } from "./models/Player";
-import { isSpaceBar } from "../../lib/gameUtil";
-import { PlayerLaser } from "./models/PlayerLaser";
 import { AlienState, KillAlien } from "./reducer";
 import { LaserHit } from "./models/LaserHit";
 import { Alien } from "./models/Alien";
-import { List, Map } from "immutable";
 import { GameComponent } from "./models/GameComponent";
 import { AlienRows } from "./models/AlienRows";
 
@@ -37,14 +34,9 @@ class RenderAliens extends React.Component<RenderAliensProps> {
     public componentDidMount() {
         if (this.canvas.current) {
             this.stage = new Stage(this.canvas.current);
-            const gameBounds = this.stage.getGameBounds();
-            this.stage.addElement(new AlienRows(this.props.alienStageElement, gameBounds));
-            this.stage.addElement(new Player(gameBounds));
+            this.stage.stageService.addElement(new AlienRows(this.props.alienStageElement, this.stage.stageService));
+            this.stage.stageService.addElement(new Player(this.stage.stageService));
         }
-
-        fromEvent(document, "keydown").subscribe(e => {
-            if (isSpaceBar(e)) this.shoot();
-        });
 
         fromEvent(window, "hit").subscribe(e => {
             if (e instanceof CustomEvent && e.detail instanceof LaserHit) {
@@ -59,17 +51,6 @@ class RenderAliens extends React.Component<RenderAliensProps> {
                 }
             }
         });
-    }
-
-    private shoot() {
-        const player: Maybe<StageElement> = this.stage.get(StageId.PLAYER);
-
-        if (!(player instanceof Player) || this.stage.has(StageId.LASER)) return void 0;
-
-        const laser: PlayerLaser = new PlayerLaser(this.stage.getGameBounds());
-
-        this.stage.addElement(laser);
-        laser.shoot(player.gameComponent);
     }
 
     private togglePause = () => {

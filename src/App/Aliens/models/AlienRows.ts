@@ -8,23 +8,19 @@ import { updateGameComponent } from "../../../lib/gameUtil";
 import { PlayerLaser } from "./PlayerLaser";
 import { LaserHit } from "./LaserHit";
 import { Directions } from "./Directions";
+import { StageService } from "../StageService";
 
 export class AlienRows implements StageElement {
-    private context: CanvasRenderingContext2D;
     public id: StageId = StageId.ALIENS;
     private dir: Directions = Directions.RIGHT;
     private SPEED: number = 1;
 
     public constructor(
         private alienRows: Map<number, List<GameComponent>>,
-        private readonly GAME_BOUNDS: DOMRect
+        private readonly stageService: StageService
     ) {
-        this.changeXPosition = this.changeXPosition.bind(this);
-    }
-
-    public setContext(context: CanvasRenderingContext2D): void {
-        this.context = context;
         this.moveLoop();
+        this.changeXPosition = this.changeXPosition.bind(this);
     }
 
     public remove(gameComponentId: string, foundRowId: number): void {
@@ -38,7 +34,7 @@ export class AlienRows implements StageElement {
     }
 
     public update(): void {
-        this.alienRows.forEach(row => row.forEach(c => updateGameComponent(this.context, c)));
+        this.alienRows.forEach(row => row.forEach(c => updateGameComponent(this.stageService.getContext(), c)));
         this.moveLoop();
     }
 
@@ -81,19 +77,20 @@ export class AlienRows implements StageElement {
             c.updatePosition(newXPosition, c.y);
         };
     }
+
     private changeDirection(xPosition: number) {
         switch (this.dir) {
             case Directions.LEFT:
-                const shouldGoRight: boolean = xPosition <= this.GAME_BOUNDS.left - 5;
+                const shouldGoRight: boolean = xPosition <= this.stageService.GAME_BOUNDS.left - 5;
                 if (shouldGoRight) this.dir = Directions.RIGHT;
 
             case Directions.RIGHT:
-                const shouldGoLeft: boolean = xPosition + 40 >= this.GAME_BOUNDS.right - 5;
+                const shouldGoLeft: boolean = xPosition + 40 >= this.stageService.GAME_BOUNDS.right - 5;
                 if (shouldGoLeft) this.dir = Directions.LEFT;
         }
     }
 
-    private lowerRow() {
+    private lowerRow(): void {
         this.alienRows.forEach(row => row.forEach(c => c.updatePosition(c.x, c.y + c.height / 2)));
     }
 }

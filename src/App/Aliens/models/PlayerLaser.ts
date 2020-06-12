@@ -2,23 +2,19 @@ import { StageElement } from "./StageElement";
 import { StageId } from "../Stage";
 import { GameComponent } from "./GameComponent";
 import { updateGameComponent } from "../../../lib/gameUtil";
+import { StageService } from "../StageService";
 
 export class PlayerLaser implements StageElement {
     public readonly id = StageId.LASER;
-    private context: CanvasRenderingContext2D;
     private laser: Maybe<GameComponent>;
     public x: number;
     public y: number;
     public width: number;
 
-    public constructor(private readonly GAME_BOUNDS: DOMRect) {}
-
-    public setContext(context: CanvasRenderingContext2D): void {
-        this.context = context;
-    }
+    public constructor(private readonly stageService: StageService) {}
 
     public update(): void {
-        if (this.laser) updateGameComponent(this.context, this.laser);
+        if (this.laser) updateGameComponent(this.stageService.getContext(), this.laser);
         this.move();
     }
 
@@ -36,7 +32,7 @@ export class PlayerLaser implements StageElement {
             2,
             20,
             c.x + c.width / 2,
-            this.GAME_BOUNDS.height - c.height,
+            this.stageService.GAME_BOUNDS.height - c.height,
             "pink",
             "player-laser"
         );

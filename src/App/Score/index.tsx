@@ -1,6 +1,5 @@
 import * as React from "react";
 import { connect } from "react-redux";
-import { createStructuredSelector } from "reselect";
 
 import { selectScoreState } from "./reducer";
 import { AppState } from "../../store";
@@ -17,8 +16,6 @@ const Score: React.FC<ScoreProps> = props => (
     </div>
 );
 
-export const ScoreConnected = connect<MapStateToProps>(() =>
-    createStructuredSelector<AppState, MapStateToProps>({
-        score: selectScoreState()
-    })
-)(Score);
+export const ScoreConnected = connect<MapStateToProps>((appState: AppState) => ({
+    score: selectScoreState(appState)
+}))(Score);

@@ -11,10 +11,8 @@ export class IncrementScore {
 
 type ScoreActions = IncrementScore;
 
-export function selectScoreState() {
-    return function (appState: AppState): number {
-        return appState.score;
-    };
+export function selectScoreState(appState: AppState): number {
+    return appState.score;
 }
 
 export function scoreReducer(state: number = 0, action: ScoreActions): number {

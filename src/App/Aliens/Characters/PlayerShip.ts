@@ -14,7 +14,7 @@ export class PlayerShip {
         return this.size * 7;
     }
 
-    public updatePosition(x: number, y: number) {
+    public updatePosition(x: number, y: number): void {
         this.x = x;
         this.y = y;
     }

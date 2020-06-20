@@ -1,6 +1,5 @@
 import * as React from "react";
 import { connect } from "react-redux";
-import { createStructuredSelector } from "reselect";
 
 import { selectLivesState } from "./reducer";
 import { AppState } from "../../store";
@@ -17,8 +16,6 @@ const Lives: React.FC<LivesProps> = props => (
     </div>
 );
 
-export const LivesConnected = connect<MapStateToProps>(() =>
-    createStructuredSelector<AppState, MapStateToProps>({
-        lives: selectLivesState()
-    })
-)(Lives);
+export const LivesConnected = connect<MapStateToProps>((appState: AppState) => ({
+    lives: selectLivesState(appState)
+}))(Lives);

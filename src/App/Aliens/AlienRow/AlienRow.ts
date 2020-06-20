@@ -4,14 +4,28 @@ import { forEach, isNil } from "../../../lib/util";
 import { BaseAlien } from "../Characters/BaseAlien";
 import { Directions } from "../models/Directions";
 import { createAliens } from "../createAliens";
+import { AlienKill, Subscriber, Subscription } from "../models/StageSubscribers";
 
 export class AlienRow implements StageElement {
-    public id: StageId = StageId.ALIENS;
+    public readonly id: StageId = StageId.ALIENS;
+    public readonly aliens: Record<number, Array<BaseAlien>> = createAliens();
     private dir: Directions = Directions.RIGHT;
     private SPEED: number = 0.3;
-    public aliens: Record<number, Array<BaseAlien>> = createAliens();
 
     public constructor(private GAME_BOUNDS: DOMRect) {}
+
+    public subscriber = new Subscriber((subscription: Subscription): void => {
+        if (!(subscription instanceof AlienKill)) return;
+
+        const row = this.aliens[subscription.rowNumber];
+        const rowIndex = row?.findIndex(alien => alien.id === subscription.alien.id);
+
+        if (isNil(rowIndex) || rowIndex === -1 || isNil(row)) return void 0;
+
+        row.splice(rowIndex, 1);
+
+        if (row.length === 0) delete this.aliens[subscription.rowNumber];
+    });
 
     public update(ctx: CanvasRenderingContext2D): void {
         this.moveLoop(ctx);
@@ -62,16 +76,5 @@ export class AlienRow implements StageElement {
             })
         );
         // this.SPEED += 0.2;
-    }
-
-    public removeAlien(rowNumber: number, alienId: string): void {
-        const row = this.aliens[rowNumber];
-        const rowIndex = row?.findIndex(alien => alien.id === alienId);
-
-        if (isNil(rowIndex) || rowIndex === -1 || isNil(row)) return void 0;
-
-        row.splice(rowIndex, 1);
-
-        if (row.length === 0) delete this.aliens[rowNumber];
     }
 }

@@ -1,13 +1,16 @@
 import * as React from "react";
 import { connect } from "react-redux";
 
-import { Stage, Subscription } from "./Stage";
+import { Stage } from "./Stage";
 import { IncrementScore } from "../Score/reducer";
 import { Player } from "./Characters/Player";
 import { AlienRow } from "./AlienRow/AlienRow";
+import { Subscriber, Subscription, SubscriptionTypes } from "./models/StageSubscribers";
+import { RemoveLife } from "../Lives/reducer";
 
 interface MapDispatchToProps {
     incrementScore(score: number): void;
+    removeLife(): void;
 }
 
 type RenderAliensProps = MapDispatchToProps;
@@ -19,10 +22,15 @@ class RenderAliens extends React.Component<RenderAliensProps> {
     public componentDidMount(): void {
         if (this.canvas.current) {
             this.stage = new Stage(this.canvas.current);
-            this.stage.subscribe(this.subscriber);
+
             const gameBounds = this.canvas.current.getBoundingClientRect();
+            const alienRows = new AlienRow(gameBounds);
+
+            this.stage.subscribe(this.subscriber);
+            this.stage.subscribe(alienRows.subscriber);
+
             this.stage.stageElementMap.addElement(new Player(gameBounds));
-            this.stage.stageElementMap.addElement(new AlienRow(gameBounds));
+            this.stage.stageElementMap.addElement(alienRows);
         }
     }
 
@@ -30,10 +38,17 @@ class RenderAliens extends React.Component<RenderAliensProps> {
         window.cancelAnimationFrame(this.stage.animationId);
     };
 
-    private subscriber = (arg: Subscription): void => {
-        if(!arg.detail) return
-        this.props.incrementScore(arg.detail.alien.scoreValue);
-    }
+    private subscriber = new Subscriber((subscription: Subscription): void => {
+        switch (subscription.type) {
+            case SubscriptionTypes.ALIEN_KILL:
+                this.props.incrementScore(subscription.alien.scoreValue);
+                break;
+
+            case SubscriptionTypes.PLAYER_DEATH:
+                this.props.removeLife();
+                break;
+        }
+    });
 
     public render(): JSX.Element {
         return (
@@ -45,11 +60,11 @@ class RenderAliens extends React.Component<RenderAliensProps> {
     }
 }
 
-export const RenderAliensConnected = connect<null, MapDispatchToProps>(
- null,
-    dispatch => ({
-        incrementScore(score): void {
-            dispatch(new IncrementScore(score));
-        }
-    })
-)(RenderAliens);
+export const RenderAliensConnected = connect<null, MapDispatchToProps>(null, dispatch => ({
+    incrementScore(score): void {
+        dispatch(new IncrementScore(score));
+    },
+    removeLife() {
+        dispatch(new RemoveLife());
+    }
+}))(RenderAliens);

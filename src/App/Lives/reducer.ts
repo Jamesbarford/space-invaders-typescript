@@ -15,10 +15,8 @@ export class RemoveLife {
 
 type LivesActions = AddLife | RemoveLife;
 
-export function selectLivesState() {
-    return function (appState: AppState): number {
-        return appState.lives;
-    };
+export function selectLivesState(appState: AppState): number {
+    return appState.lives;
 }
 
 export function livesReducer(state: number = 3, action: LivesActions): number {

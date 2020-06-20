@@ -27,8 +27,10 @@ module.exports = {
         new HtmlWebpackPlugin({ template: "index.html" }),
         new webpack.HashedModuleIdsPlugin(),
         new ForkTsCheckerWebpackPlugin({
-            eslint: true,
-            tsconfig: path.resolve(__dirname, "tsconfig.json"),
+            eslint: {
+                enabled: true,
+                files: "./src/*"
+            }
         })
     ],
     optimization: {

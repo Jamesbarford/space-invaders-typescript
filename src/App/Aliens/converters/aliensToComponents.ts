@@ -1,24 +1,21 @@
-import { List, Map } from "immutable";
-
 import { Alien } from "../models/Alien";
-import { GameComponent } from "../models/GameComponent";
+import { forEach } from "../../../lib/util";
+import { BaseAlien, AlienConstructor } from "../Characters/BaseAlien";
 
 export function aliensToComponents(
-    a: Map<string, Alien>,
-    y: number = 4,
-    color: string
-): List<GameComponent> {
+    a: Record<string, Alien>,
+    y: number,
+    color: string,
+    AlienClass: AlienConstructor
+): Array<BaseAlien> {
     let lastX = 0;
+    const list: Array<BaseAlien> = [];
 
-    return List<GameComponent>().withMutations(list => {
-        for (const alien of a.values()) {
-            if (alien) {
-                const component = new GameComponent(40, 20, lastX, y, color, alien.id);
+    forEach(a, alien => {
+        if (alien) list.push(new AlienClass(lastX, y, 3, color, alien.id));
+        lastX += 60;
+    })
 
-                list.push(component);
-            }
 
-            lastX += 60;
-        }
-    });
+    return list;
 }

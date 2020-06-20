@@ -1,7 +1,6 @@
 export class GameComponent {
     public constructor(
-        public width: number,
-        public height: number,
+        public size: number,
         public x: number,
         public y: number,
         public color: string,

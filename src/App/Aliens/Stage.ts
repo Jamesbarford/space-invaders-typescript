@@ -1,12 +1,14 @@
-import { PlayerLaser } from "./models/PlayerLaser";
-import { AlienRows } from "./models/AlienRows";
-import { LaserHit } from "./models/LaserHit";
-import { StageService } from "./StageService";
-import { isNil } from "../../lib/util";
+import { fromEvent } from "rxjs";
+import { StageElementMap } from "./StageElementMap";
+import { forEach, get, isNil } from "../../lib/util";
+import { GAME_EVENT, GameAction, GameActions, GameEvent, PlayerLaserFire } from "./GameEvent";
+import { AlienRow } from "./AlienRow/AlienRow";
+import { hitDetection } from "../../lib/gameUtil";
 
 export const enum StageId {
     ALIENS,
     LASER,
+    ALIEN_LASER,
     BONUS,
     PLAYER,
     DEBUG
@@ -14,8 +16,8 @@ export const enum StageId {
 
 export class Stage {
     public animationId: number;
-    private readonly context: CanvasRenderingContext2D;
-    public readonly stageService: StageService
+    public readonly context: CanvasRenderingContext2D;
+    public readonly stageElementMap: StageElementMap;
 
     public constructor(public readonly canvas: HTMLCanvasElement) {
         this.canvas.width = 800;
@@ -25,37 +27,49 @@ export class Stage {
         if (!isNil(context)) this.context = context;
         else throw new Error("Canvas context not found");
 
-        this.stageService = new StageService(canvas.getBoundingClientRect(), context);
+        this.stageElementMap = new StageElementMap(context);
 
         this.updateCanvas = this.updateCanvas.bind(this);
-
+        this.addGameListeners();
         this.updateCanvas();
     }
 
-    private shotDetection(): void {
-        const laser = this.stageService.get(StageId.LASER);
-        if (!(laser instanceof PlayerLaser)) return void 0;
+    private addGameListeners(): void {
+        fromEvent(document, GAME_EVENT).subscribe(e => {
+            const action: Maybe<GameActions> = get(e, "detail");
+            if (!(action instanceof GameAction)) return void 0;
 
-        const aliens = this.stageService.get(StageId.ALIENS);
-        if (!(aliens instanceof AlienRows)) return void 0;
+            switch (action.type) {
+                case GameEvent.ALIEN_LASER_FIRE:
+                    break;
 
-        const laserHit: Maybe<LaserHit> = aliens.detectHit(laser);
+                case GameEvent.PLAYER_LASER_FIRE:
+                    if (this.stageElementMap.has(StageId.LASER)) break;
+                    this.stageElementMap.addElement(action);
+                    break;
+            }
+        });
+    }
 
-        if (laserHit instanceof LaserHit) {
-            aliens.remove(laserHit.gameComponent.id, laserHit.rowId);
-            this.stageService.addElement(aliens);
-            this.stageService.delete(StageId.LASER);
+    private playerLaserTracker(): void {
+        const playerLaserFire = this.stageElementMap.get(StageId.LASER);
+        const alienRows = this.stageElementMap.get(StageId.ALIENS);
+        if (!(playerLaserFire instanceof PlayerLaserFire) || !(alienRows instanceof AlienRow)) return;
 
-            window.dispatchEvent(new CustomEvent("hit", { detail: laserHit }));
-        }
+        if (playerLaserFire.y < 0) this.stageElementMap.delete(StageId.LASER);
 
-        if (laser.y <= 0) this.stageService.delete(StageId.LASER);
+        forEach(alienRows.aliens, row => forEach(row, alien => {
+            if (hitDetection(playerLaserFire.playerLaser, alien)) {
+                this.stageElementMap.delete(StageId.LASER);
+            }
+        }));
+
     }
 
     private updateCanvas(): void {
-        this.shotDetection();
         this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
-        this.stageService.update();
+        this.stageElementMap.update();
+        this.playerLaserTracker();
         this.animationId = window.requestAnimationFrame(this.updateCanvas);
     }
 }

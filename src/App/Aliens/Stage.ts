@@ -1,6 +1,5 @@
-import { fromEvent } from "rxjs";
 import { StageElementMap } from "./StageElementMap";
-import { forEach, get, isNil } from "../../lib/util";
+import { forEach, get, isNil, fromEvent } from "../../lib/util";
 import { GAME_EVENT, GameAction, GameActions, GameEvent, PlayerLaserFire } from "./GameEvent";
 import { AlienRow } from "./AlienRow/AlienRow";
 import { hitDetection } from "../../lib/gameUtil";

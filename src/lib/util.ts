@@ -62,3 +62,15 @@ export function get<T, K, V>(arg: T, path: K | Array<K>, fallback?: V): V | unde
 
     return i && i === length ? <any>arg : fallback;
 }
+
+
+export function fromEvent(domElement: Node, eventName: string) {
+    return {
+        subscribe: (eventHandler: (e: Event) => void) => {
+            domElement.addEventListener(eventName, eventHandler);
+        },
+        unsubscribe: (eventHandler: (e: Event) => void) => {
+            domElement.removeEventListener(eventName, eventHandler);
+        }
+    }
+}

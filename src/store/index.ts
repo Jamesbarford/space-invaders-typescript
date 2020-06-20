@@ -1,6 +1,5 @@
 import { createStore, combineReducers, Dispatch, AnyAction, applyMiddleware, compose } from "redux";
 import { createLogger } from "redux-logger";
-import { Observable } from "rxjs";
 
 import { isFunction } from "../lib/util";
 import { livesReducer } from "../App/Lives/reducer";
@@ -38,9 +37,3 @@ function stripClassActions() {
 }
 
 export const store = createStore(reducers, enhancers);
-export const observableStore: Observable<{
-    state: AppState;
-    dispatch: Dispatch;
-}> = new Observable(subscriber =>
-    store.subscribe(() => subscriber.next({ state: store.getState(), dispatch: store.dispatch }))
-);

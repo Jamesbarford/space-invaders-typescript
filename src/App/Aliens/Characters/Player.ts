@@ -1,10 +1,9 @@
-import { fromEvent } from "rxjs";
-
 import { StageElement } from "../models/StageElement";
 import { StageId } from "../Stage";
 import { isLeftKey, isRightKey, isSpaceBar } from "../../../lib/gameUtil";
 import { PlayerLaserFire } from "../GameEvent";
 import { PlayerShip } from "./PlayerShip";
+import { fromEvent } from "../../../lib/util";
 
 export class Player implements StageElement {
     public readonly id: StageId = StageId.PLAYER;

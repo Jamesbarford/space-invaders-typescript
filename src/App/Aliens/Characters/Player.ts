@@ -11,7 +11,7 @@ export class Player implements StageElement {
     private readonly player: PlayerShip = new PlayerShip(4);
     private RIGHT: boolean = false;
     private LEFT: boolean = false;
-    private SPEED: number = 12.5;
+    private SPEED: number = 8;
 
     public constructor(private readonly GAME_BOUNDS: DOMRect) {
         this.player.updatePosition(200, this.GAME_BOUNDS.height - this.player.height);
@@ -49,6 +49,9 @@ export class Player implements StageElement {
     }
 
     private shoot(): void {
-        PlayerLaserFire.dispatch(this.player.x + this.player.width / 2, this.player.y - this.player.size);
+        PlayerLaserFire.dispatch(
+            this.player.x + this.player.width / 2,
+            this.player.y - this.player.size
+        );
     }
 }

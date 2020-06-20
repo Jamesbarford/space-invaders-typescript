@@ -19,15 +19,11 @@ export class StageElementMap {
         return get(this.stageElementMap, stageId);
     }
 
-    public delete(stageId: StageId): void {
-        delete this.stageElementMap[stageId];
+    public delete(stageId: StageId): boolean {
+        return delete this.stageElementMap[stageId];
     }
 
     public update(): void {
         forEach(this.stageElementMap, arg => arg.update(this.context));
-    }
-
-    public getContext(): CanvasRenderingContext2D {
-        return this.context;
     }
 }

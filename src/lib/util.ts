@@ -22,25 +22,27 @@ export function inRange(value: number, min: number, max: number): boolean {
     return value >= min && value <= max;
 }
 
-export function forEach<T>(arg: Array<T>, cb: (val: T, index: number) => void): void;
+export function forEach<T>(arg: Array<T>, cb: (val: T, index: number) => boolean | void): boolean | void;
 export function forEach<T>(
     arg: Dictionary<T>,
-    cb: (val: T, key: keyof Dictionary<T>, index: number) => void
-): void;
+    cb: (val: T, key: keyof Dictionary<T>, index: number) =>  boolean | void
+): boolean | void;
 
-export function forEach(arg: any, cb: any): void {
-    if (isArray(arg)) forEachArray(arg, cb);
-    else if (isObject(arg)) forEachObj(<any>arg, cb);
+export function forEach(arg: any, cb: any): boolean | void {
+    if (isArray(arg)) return forEachArray(arg, cb);
+    else if (isObject(arg)) return forEachObj(<any>arg, cb);
 }
 
-function forEachObj<T>(arg: Dictionary<T>, cb: (val: T, key: string, index: number) => void): void {
+export function forEachObj<T>(
+    arg: Dictionary<T>,
+    cb: (val: T, key: string, index: number) => boolean | void
+): true | void {
     let i = -1;
-    for (const key in arg) cb(arg[key], key, ++i);
+    for (const key in arg) if (cb(arg[key], key, ++i)) return true;
 }
 
-function forEachArray<T>(arg: Array<T>, cb: (val: T, index: number) => void): void {
-    let i = -1;
-    for (const iterator of arg) cb(iterator, ++i);
+function forEachArray<T>(arg: Array<T>, cb: (val: T, index: number) => void | true): boolean | void {
+    for (let i = 0; i < arg.length; ++i) if (cb(arg[i], i)) return true;
 }
 
 export function deleteInDict<T>(dictionary: Dictionary<T>, key: string): Dictionary<T> {

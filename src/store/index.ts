@@ -5,12 +5,10 @@ import { Observable } from "rxjs";
 import { isFunction } from "../lib/util";
 import { livesReducer } from "../App/Lives/reducer";
 import { scoreReducer } from "../App/Score/reducer";
-import { aliensReducer, AlienState } from "../App/Aliens/reducer";
 
 export interface AppState {
     lives: number;
     score: number;
-    aliens: AlienState;
 }
 
 const middleware = applyMiddleware(
@@ -24,8 +22,7 @@ const middleware = applyMiddleware(
 
 const reducers = combineReducers<AppState, AnyAction>({
     lives: livesReducer,
-    score: scoreReducer,
-    aliens: aliensReducer
+    score: scoreReducer
 });
 
 const enhancers = compose(

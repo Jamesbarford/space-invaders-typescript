@@ -8,7 +8,7 @@ export class EggAlien extends BaseAlien {
     }
 
     public get width(): number {
-        return this.size * 7;
+        return this.size * 8;
     }
 
     public get height(): number {
@@ -19,14 +19,15 @@ export class EggAlien extends BaseAlien {
         this.x = x;
         this.y = y;
         this.drawBody(ctx);
+        ctx.fillStyle = this.color;
         if (this.frame === 1) {
             this.legsFrame1(ctx);
-            if (Number.isInteger(x / 8)) this.frame = 0
-        }  else {
+            if (Number.isInteger(x / this.FRAME_SPEED)) this.frame = 0;
+        } else {
             this.legsFrame2(ctx);
-            if (Number.isInteger(x / 8)) this.frame = 1
+            if (Number.isInteger(x / this.FRAME_SPEED)) this.frame = 1;
         }
-
+        ctx.fillStyle = "";
     }
 
     private drawBody(ctx: CanvasRenderingContext2D): void {
@@ -39,8 +40,8 @@ export class EggAlien extends BaseAlien {
 
         const eyeRow = y + this.size * 3;
         ctx.fillRect(x, eyeRow, this.size * 8, this.size);
-        ctx.clearRect(x + (this.size * 2), eyeRow, this.size, this.size);
-        ctx.clearRect(x + (this.size * 5), eyeRow, this.size, this.size);
+        ctx.clearRect(x + this.size * 2, eyeRow, this.size, this.size);
+        ctx.clearRect(x + this.size * 5, eyeRow, this.size, this.size);
 
         ctx.fillRect(x, y + this.size * 4, this.size * 8, this.size);
     }
@@ -56,7 +57,6 @@ export class EggAlien extends BaseAlien {
         ctx.fillRect(x + this.size, legRowMiddle, this.size, this.size);
         ctx.fillRect(x + this.size * 3, legRowMiddle, this.size * 2, this.size);
         ctx.fillRect(x + this.size * 6, legRowMiddle, this.size, this.size);
-
 
         const legRowBottom = y + this.size * 7;
         ctx.fillRect(x, legRowBottom, this.size, this.size);
@@ -75,7 +75,6 @@ export class EggAlien extends BaseAlien {
         const legRowMiddle = y + this.size * 6;
         ctx.fillRect(x, legRowMiddle, this.size, this.size);
         ctx.fillRect(x + this.size * 7, legRowMiddle, this.size, this.size);
-
 
         const legRowBottom = y + this.size * 7;
         ctx.fillRect(x + this.size, legRowBottom, this.size, this.size);

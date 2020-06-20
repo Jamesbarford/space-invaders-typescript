@@ -1,11 +1,4 @@
-import { GameComponent } from "../App/Aliens/models/GameComponent";
 import { inRange } from "./util";
-
-export function updateGameComponent(context: CanvasRenderingContext2D, c: GameComponent): void {
-    context.fillStyle = c.color;
-    context.fillRect(c.x, c.y, c.size, c.size);
-    context.fillStyle = "";
-}
 
 export function isLeftKey(e: Event): boolean {
     if (!isKeyBoardEvent(e)) return false;
@@ -34,8 +27,8 @@ export function hitDetection(
     projectile: { x: number; y: number; height: number; width: number },
     target: { x: number; y: number; height: number; width: number }
 ): boolean {
-    const hasHit = inRange(projectile.x + projectile.width, target.x, target.x + target.width) &&
-        inRange(projectile.y, target.y, target.y + target.height);
-
-    return hasHit
+    return (
+        inRange(projectile.x, target.x - 4, target.x + target.width) &&
+        inRange(projectile.y, target.y - 5, target.y + target.height)
+    );
 }

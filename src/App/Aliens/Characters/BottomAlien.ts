@@ -2,14 +2,13 @@ import { BaseAlien } from "./BaseAlien";
 
 export class BottomAlien extends BaseAlien {
     private frame: number = 0;
-    private FRAME_SPEED: number = 8;
 
     public update(ctx: CanvasRenderingContext2D, x: number, y: number): void {
         this.draw(ctx, x, y);
     }
 
     public get width(): number {
-        return this.size * 12;
+        return this.size * 17;
     }
 
     public get height(): number {
@@ -19,14 +18,16 @@ export class BottomAlien extends BaseAlien {
     public draw(ctx: CanvasRenderingContext2D, x: number, y: number): void {
         this.x = x;
         this.y = y;
+        ctx.fillStyle = this.color;
         this.drawBody(ctx);
         if (this.frame === 1) {
             this.legsFrame1(ctx);
-            if (Number.isInteger(x / this.FRAME_SPEED)) this.frame = 0;
+            if (Number.isInteger(~~x / ~~this.FRAME_SPEED)) this.frame = 0;
         } else {
             this.legsFrame2(ctx);
-            if (Number.isInteger(x / this.FRAME_SPEED)) this.frame = 1;
+            if (Number.isInteger(~~x / ~~this.FRAME_SPEED)) this.frame = 1;
         }
+        ctx.fillStyle = "";
     }
 
     private drawBody(ctx: CanvasRenderingContext2D): void {

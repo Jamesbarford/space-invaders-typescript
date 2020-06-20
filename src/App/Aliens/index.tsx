@@ -1,44 +1,39 @@
 import * as React from "react";
 import { connect } from "react-redux";
-import { createStructuredSelector } from "reselect";
 
-import { Stage } from "./Stage";
+import { Stage, Subscription } from "./Stage";
 import { IncrementScore } from "../Score/reducer";
-import { generateAliens, selectAlienState } from "./selectors";
-import { AppState } from "../../store";
 import { Player } from "./Characters/Player";
-import { AlienState, KillAlien } from "./reducer";
 import { AlienRow } from "./AlienRow/AlienRow";
-import { BaseAlien } from "./Characters/BaseAlien";
 
 interface MapDispatchToProps {
     incrementScore(score: number): void;
-    killAlien(rowNumber: number, alienId: string): void;
 }
 
-interface MapStateToProps {
-    alienStageElement: Record<number, Array<BaseAlien>>;
-    alienState: AlienState;
-}
-
-type RenderAliensProps = MapDispatchToProps & MapStateToProps;
+type RenderAliensProps = MapDispatchToProps;
 
 class RenderAliens extends React.Component<RenderAliensProps> {
     private canvas: React.RefObject<HTMLCanvasElement> = React.createRef();
     private stage: Stage;
 
-    public componentDidMount() {
+    public componentDidMount(): void {
         if (this.canvas.current) {
             this.stage = new Stage(this.canvas.current);
+            this.stage.subscribe(this.subscriber);
             const gameBounds = this.canvas.current.getBoundingClientRect();
             this.stage.stageElementMap.addElement(new Player(gameBounds));
-            this.stage.stageElementMap.addElement(new AlienRow(this.props.alienStageElement, gameBounds))
+            this.stage.stageElementMap.addElement(new AlienRow(gameBounds));
         }
     }
 
-    private togglePause = () => {
+    private togglePause = (): void => {
         window.cancelAnimationFrame(this.stage.animationId);
     };
+
+    private subscriber = (arg: Subscription): void => {
+        if(!arg.detail) return
+        this.props.incrementScore(arg.detail.alien.scoreValue);
+    }
 
     public render(): JSX.Element {
         return (
@@ -50,18 +45,11 @@ class RenderAliens extends React.Component<RenderAliensProps> {
     }
 }
 
-export const RenderAliensConnected = connect<MapStateToProps, MapDispatchToProps>(
-    () =>
-        createStructuredSelector<AppState, MapStateToProps>({
-            alienStageElement: generateAliens(),
-            alienState: selectAlienState()
-        }),
+export const RenderAliensConnected = connect<null, MapDispatchToProps>(
+ null,
     dispatch => ({
         incrementScore(score): void {
             dispatch(new IncrementScore(score));
-        },
-        killAlien(rowNumber, alienId) {
-            dispatch(new KillAlien(rowNumber, alienId));
         }
     })
 )(RenderAliens);

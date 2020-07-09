@@ -61,8 +61,8 @@ export class Player implements StageElement {
         return this.playerShip;
     }
 
-    public observer = new StageObservable(Oubscription => {
-        switch (Oubscription.type) {
+    public observer = new StageObservable(event => {
+        switch (event.type) {
             case StageObserverTypes.PLAYER_DEATH:
                 break;
             case StageObserverTypes.REMOVE_PLAYER_LASER:

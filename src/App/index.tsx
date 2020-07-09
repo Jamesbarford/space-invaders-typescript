@@ -2,7 +2,7 @@ import * as React from "react";
 import { connect } from "react-redux";
 
 import { Stage } from "../stage/Stage";
-import { StageObservable, StageObservableEvent, StageObserverTypes } from "../stage/StageObservables";
+import { StageObservable, StageObserverTypes } from "../stage/StageObservables";
 
 import { IncrementScore } from "./Score/reducer";
 import { RemoveLife } from "./Lives/reducer";
@@ -44,7 +44,7 @@ class RenderGame extends React.Component<RenderGameProps> {
         window.cancelAnimationFrame(this.stage.animationId);
     };
 
-    private observer = new StageObservable((event: StageObservableEvent): void => {
+    private observer = new StageObservable(event => {
         switch (event.type) {
             case StageObserverTypes.ALIEN_KILL:
                 this.props.incrementScore(event.alien.scoreValue);

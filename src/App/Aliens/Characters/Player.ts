@@ -4,10 +4,12 @@ import { isLeftKey, isRightKey, isSpaceBar } from "../../../lib/gameUtil";
 import { PlayerLaserFire } from "../GameEvent";
 import { PlayerShip } from "./PlayerShip";
 import { fromEvent } from "../../../lib/util";
+import { PIXEL_SIZE } from "../../../constants";
+import { PlayerDeath, Subscriber } from "../models/StageSubscribers";
 
 export class Player implements StageElement {
     public readonly id: StageId = StageId.PLAYER;
-    private readonly player: PlayerShip = new PlayerShip(4);
+    private readonly player: PlayerShip = new PlayerShip(PIXEL_SIZE);
     private RIGHT: boolean = false;
     private LEFT: boolean = false;
     private SPEED: number = 8;
@@ -53,4 +55,14 @@ export class Player implements StageElement {
             this.player.y - this.player.size
         );
     }
+
+    public getShip(): PlayerShip {
+        return this.player;
+    }
+
+    public subscriber = new Subscriber(subscription => {
+        if (subscription instanceof PlayerDeath) {
+            console.log("dead");
+        }
+    });
 }

@@ -25,4 +25,8 @@ export abstract class BaseAlien {
     public incrementFrameSpeed(increment: number): void {
         this.FRAME_SPEED -= increment;
     }
+
+    public shoot(): void {
+        return;
+    }
 }

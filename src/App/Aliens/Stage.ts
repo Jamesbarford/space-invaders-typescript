@@ -41,6 +41,7 @@ export class Stage {
         this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
         this.stageElementMap.update();
         this.stageEvents.trackPlayerLaser(this.stageElementMap, this.subscribers);
+        this.stageEvents.trackAlienLaser(this.stageElementMap, this.subscribers);
         this.animationId = window.requestAnimationFrame(this.updateCanvas);
     };
 }

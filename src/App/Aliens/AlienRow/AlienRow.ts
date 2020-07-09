@@ -5,14 +5,49 @@ import { BaseAlien } from "../Characters/BaseAlien";
 import { Directions } from "../models/Directions";
 import { createAliens } from "../createAliens";
 import { AlienKill, Subscriber, Subscription } from "../models/StageSubscribers";
+import { AlienLaserMap } from "../Laser/AlienLaserMap";
+import { AlienLaserFire } from "../Laser/AlienLaserFire";
 
 export class AlienRow implements StageElement {
     public readonly id: StageId = StageId.ALIENS;
     public readonly aliens: Record<number, Array<BaseAlien>> = createAliens();
+    public readonly alienLaserMap: AlienLaserMap;
     private dir: Directions = Directions.RIGHT;
-    private SPEED: number = 0.3;
+    private SPEED: number = 0.5;
+    private timerId: NodeJS.Timeout | undefined;
 
-    public constructor(private GAME_BOUNDS: DOMRect) {}
+    public constructor(private GAME_BOUNDS: DOMRect) {
+        this.alienLaserMap = new AlienLaserMap(GAME_BOUNDS, 5);
+        this.occasionallyShoot();
+    }
+
+    private occasionallyShoot(): void {
+        if (!this.timerId) {
+            const rng = ~~(Math.random() * 5000);
+
+            this.timerId = setInterval(() => {
+                const alien = this.selectRandomAlien();
+                if (!alien) {
+                    clearInterval(<number | undefined>this.timerId);
+                    this.timerId = undefined;
+                } else {
+                    if (alien) this.alienLaserMap.add(AlienLaserFire.create(alien));
+                    this.timerId = undefined;
+                }
+            }, rng);
+        }
+    }
+
+    private selectRandomAlien(): Maybe<BaseAlien> {
+        const randomRowId = ~~(Math.random() * 5);
+        const row: Maybe<Array<BaseAlien>> = this.aliens?.[randomRowId];
+
+        if (row) {
+            const randomAlien = ~~(Math.random() * row.length);
+
+            return row?.[randomAlien];
+        }
+    }
 
     public subscriber = new Subscriber((subscription: Subscription): void => {
         if (!(subscription instanceof AlienKill)) return;
@@ -29,20 +64,17 @@ export class AlienRow implements StageElement {
 
     public update(ctx: CanvasRenderingContext2D): void {
         this.moveLoop(ctx);
+        this.alienLaserMap.update(ctx);
     }
 
     private moveLoop(ctx: CanvasRenderingContext2D): void {
-        if (this.dir === Directions.RIGHT) {
-            forEach(this.aliens, row => forEach(row, this.changeXPosition(+this.SPEED, ctx)));
-        } else {
-            forEach(this.aliens, row => forEach(row, this.changeXPosition(-this.SPEED, ctx)));
-        }
+        const speed = this.dir === Directions.RIGHT ? +this.SPEED : -this.SPEED;
+        forEach(this.aliens, row => forEach(row, this.changeXPosition(speed, ctx)));
     }
 
     private changeXPosition(speed: number, ctx: CanvasRenderingContext2D): (c: BaseAlien) => void {
         return (c: BaseAlien): void => {
             const newXPosition: number = (c.x += speed);
-
             this.changeDirection(newXPosition, ctx);
             c.draw(ctx, newXPosition, c.y);
         };
@@ -75,6 +107,6 @@ export class AlienRow implements StageElement {
                 // c.incrementFrameSpeed(0.2)
             })
         );
-        // this.SPEED += 0.2;
+        this.SPEED += 0.05;
     }
 }

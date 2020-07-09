@@ -25,11 +25,14 @@ class RenderAliens extends React.Component<RenderAliensProps> {
 
             const gameBounds = this.canvas.current.getBoundingClientRect();
             const alienRows = new AlienRow(gameBounds);
+            const player = new Player(gameBounds);
 
             this.stage.subscribe(this.subscriber);
             this.stage.subscribe(alienRows.subscriber);
+            this.stage.subscribe(player.subscriber);
 
-            this.stage.stageElementMap.addElement(new Player(gameBounds));
+            this.stage.stageElementMap.addElement(alienRows.alienLaserMap);
+            this.stage.stageElementMap.addElement(player);
             this.stage.stageElementMap.addElement(alienRows);
         }
     }

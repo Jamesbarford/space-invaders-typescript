@@ -4,7 +4,7 @@ import { EggAlien } from "./Characters/EggAlien";
 import { AlienConstructor, BaseAlien } from "./Characters/BaseAlien";
 import { BottomAlien } from "./Characters/BottomAlien";
 import { MiddleAlien } from "./Characters/MiddleAlien";
-import { ORANGE, WHITE } from "../../constants";
+import { ORANGE, WHITE, PIXEL_SIZE } from "../../constants";
 
 export function createAliens(): Record<number, Array<BaseAlien>> {
     return {
@@ -29,7 +29,7 @@ function createAlienList(
         lastX: number = xOffset;
 
     while (--i > 0) {
-        alienList.push(new AlienClass(lastX, yPosition, 3, color, uuid(), scoreValue));
+        alienList.push(new AlienClass(lastX, yPosition, PIXEL_SIZE, color, uuid(), scoreValue));
         lastX += 60;
     }
 

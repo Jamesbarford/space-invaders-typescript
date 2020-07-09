@@ -30,7 +30,6 @@ export class Stage {
         this.stageElementMap = new StageElementMap(context);
 
         this.updateCanvas();
-        this.stageEvents.addGameListeners(this.stageElementMap);
     }
 
     public subscribe(cb: Subscriber): void {

@@ -15,7 +15,8 @@ export class StageSubscribers {
 
 export const enum SubscriptionTypes {
     ALIEN_KILL,
-    PLAYER_DEATH
+    PLAYER_DEATH,
+    REMOVE_PLAYER_LASER
 }
 
 export interface SubscriptionAction {
@@ -35,4 +36,8 @@ export class PlayerDeath implements SubscriptionAction {
     public readonly type = SubscriptionTypes.PLAYER_DEATH;
 }
 
-export type Subscription = AlienKill | PlayerDeath;
+export class RemovePlayerLaser implements SubscriptionAction {
+    public readonly type = SubscriptionTypes.REMOVE_PLAYER_LASER;
+}
+
+export type Subscription = AlienKill | PlayerDeath | RemovePlayerLaser;

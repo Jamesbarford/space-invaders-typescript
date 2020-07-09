@@ -1,21 +1,22 @@
 import { StageElement } from "../models/StageElement";
 import { StageId } from "../Stage";
 import { isLeftKey, isRightKey, isSpaceBar } from "../../../lib/gameUtil";
-import { PlayerLaserFire } from "../GameEvent";
 import { PlayerShip } from "./PlayerShip";
 import { fromEvent } from "../../../lib/util";
 import { PIXEL_SIZE } from "../../../constants";
-import { PlayerDeath, Subscriber } from "../models/StageSubscribers";
+import { Subscriber, SubscriptionTypes } from "../models/StageSubscribers";
+import { PlayerLaserMap } from "../Laser/PlayerLaserMap";
 
 export class Player implements StageElement {
     public readonly id: StageId = StageId.PLAYER;
-    private readonly player: PlayerShip = new PlayerShip(PIXEL_SIZE);
+    public readonly laserMap: PlayerLaserMap = new PlayerLaserMap();
+    private readonly playerShip: PlayerShip = new PlayerShip(PIXEL_SIZE);
     private RIGHT: boolean = false;
     private LEFT: boolean = false;
     private SPEED: number = 8;
 
     public constructor(private readonly GAME_BOUNDS: DOMRect) {
-        this.player.updatePosition(200, this.GAME_BOUNDS.height - this.player.height);
+        this.playerShip.updatePosition(200, this.GAME_BOUNDS.height - this.playerShip.height);
         this.addListeners();
     }
 
@@ -24,12 +25,12 @@ export class Player implements StageElement {
     }
 
     private move(ctx: CanvasRenderingContext2D): void {
-        if (this.LEFT && this.player.x >= 5) {
-            return this.player.update(ctx, (this.player.x -= this.SPEED), this.player.y);
-        } else if (this.RIGHT && this.player.x < this.GAME_BOUNDS.width - this.player.width) {
-            return this.player.update(ctx, (this.player.x += this.SPEED), this.player.y);
+        if (this.LEFT && this.playerShip.x >= 5) {
+            return this.playerShip.update(ctx, (this.playerShip.x -= this.SPEED), this.playerShip.y);
+        } else if (this.RIGHT && this.playerShip.x < this.GAME_BOUNDS.width - this.playerShip.width) {
+            return this.playerShip.update(ctx, (this.playerShip.x += this.SPEED), this.playerShip.y);
         } else {
-            return this.player.update(ctx, this.player.x, this.player.y);
+            return this.playerShip.update(ctx, this.playerShip.x, this.playerShip.y);
         }
     }
 
@@ -50,19 +51,20 @@ export class Player implements StageElement {
     }
 
     private shoot(): void {
-        PlayerLaserFire.dispatch(
-            this.player.x + this.player.width / 2,
-            this.player.y - this.player.size
-        );
+        this.laserMap.add(this.getShip());
     }
 
     public getShip(): PlayerShip {
-        return this.player;
+        return this.playerShip;
     }
 
     public subscriber = new Subscriber(subscription => {
-        if (subscription instanceof PlayerDeath) {
-            console.log("dead");
+        switch (subscription.type) {
+            case SubscriptionTypes.PLAYER_DEATH:
+                break;
+            case SubscriptionTypes.REMOVE_PLAYER_LASER:
+                this.laserMap.delete();
+                break;
         }
     });
 }

@@ -1,25 +1,30 @@
-export function isObject(arg: any): arg is object {
+export function isObject(arg: unknown): arg is object {
     return toObjectString(arg) === "[object Object]";
 }
 
-function toObjectString(arg: any): string {
+function toObjectString(arg: unknown): string {
     return Object.prototype.toString.call(arg);
 }
 
-export function isFunction(arg: any): arg is Function {
+export function isFunction(arg: unknown): arg is Function {
     return toObjectString(arg) === "[object Function]";
 }
 
-export function isArray(arg: any): arg is Array<any> {
+export function isArray<T>(arg: unknown): arg is Array<T> {
     return toObjectString(arg) === "[object Array]";
 }
 
-export function isNil(arg: any): arg is null | undefined {
+export function isNil(arg: unknown): arg is null | undefined {
     return arg === undefined || arg === null;
 }
 
 export function inRange(value: number, min: number, max: number): boolean {
     return value >= min && value <= max;
+}
+
+export function castArray<T>(arg: T | Array<T>): Array<T> {
+    if (isArray(arg)) return arg;
+    return [arg];
 }
 
 export function forEach<T>(arg: Array<T>, cb: (val: T, index: number) => boolean | void): boolean | void;
@@ -43,11 +48,6 @@ export function forEachObj<T>(
 
 function forEachArray<T>(arg: Array<T>, cb: (val: T, index: number) => void | true): boolean | void {
     for (let i = 0; i < arg.length; ++i) if (cb(arg[i], i)) return true;
-}
-
-export function deleteInDict<T>(dictionary: Dictionary<T>, key: string): Dictionary<T> {
-    const { [key]: value, ...withoutKey } = dictionary;
-    return withoutKey;
 }
 
 export function get<T, K, V>(arg: T, path: K | Array<K>, fallback?: V): V | undefined {

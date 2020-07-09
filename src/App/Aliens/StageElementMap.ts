@@ -3,7 +3,7 @@ import { StageId } from "./Stage";
 import { forEach, get } from "../../lib/util";
 
 export class StageElementMap {
-    private stageElementMap: Record<string, StageElement> = <Record<StageId, StageElement>>{};
+    private stageElementMap: Record<StageId, StageElement> = <Record<StageId, StageElement>>{};
 
     public constructor(private readonly context: CanvasRenderingContext2D) {}
 

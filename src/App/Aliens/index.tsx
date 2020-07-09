@@ -33,6 +33,7 @@ class RenderAliens extends React.Component<RenderAliensProps> {
 
             this.stage.stageElementMap.addElement(alienRows.alienLaserMap);
             this.stage.stageElementMap.addElement(player);
+            this.stage.stageElementMap.addElement(player.laserMap);
             this.stage.stageElementMap.addElement(alienRows);
         }
     }
@@ -64,7 +65,7 @@ class RenderAliens extends React.Component<RenderAliensProps> {
 }
 
 export const RenderAliensConnected = connect<null, MapDispatchToProps>(null, dispatch => ({
-    incrementScore(score): void {
+    incrementScore(score) {
         dispatch(new IncrementScore(score));
     },
     removeLife() {

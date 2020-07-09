@@ -1,11 +1,14 @@
-import { StageElement } from "../models/StageElement";
-import { StageId } from "../Stage";
-import { isLeftKey, isRightKey, isSpaceBar } from "../../../lib/gameUtil";
-import { PlayerShip } from "./PlayerShip";
-import { fromEvent } from "../../../lib/util";
-import { PIXEL_SIZE } from "../../../constants";
-import { Subscriber, SubscriptionTypes } from "../models/StageSubscribers";
-import { PlayerLaserMap } from "../Laser/PlayerLaserMap";
+import { StageElement } from "../../stage/StageElement";
+import { StageId } from "../../stage/Stage";
+import { StageObservable, StageObserverTypes } from "../../stage/StageObservables";
+
+import { isLeftKey, isRightKey, isSpaceBar } from "../../lib/gameUtil";
+import { fromEvent } from "../../lib/util";
+
+import { PIXEL_SIZE } from "../../constants";
+
+import { PlayerShip } from "./Models/PlayerShip";
+import { PlayerLaserMap } from "./Laser/PlayerLaserMap";
 
 export class Player implements StageElement {
     public readonly id: StageId = StageId.PLAYER;
@@ -58,11 +61,11 @@ export class Player implements StageElement {
         return this.playerShip;
     }
 
-    public subscriber = new Subscriber(subscription => {
-        switch (subscription.type) {
-            case SubscriptionTypes.PLAYER_DEATH:
+    public observer = new StageObservable(Oubscription => {
+        switch (Oubscription.type) {
+            case StageObserverTypes.PLAYER_DEATH:
                 break;
-            case SubscriptionTypes.REMOVE_PLAYER_LASER:
+            case StageObserverTypes.REMOVE_PLAYER_LASER:
                 this.laserMap.delete();
                 break;
         }

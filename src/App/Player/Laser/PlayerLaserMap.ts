@@ -1,9 +1,12 @@
-import { Laser } from "./Laser";
-import { GREEN } from "../../../constants";
-import { PlayerShip } from "../Characters/PlayerShip";
-import { StageElement } from "../models/StageElement";
-import { StageId } from "../Stage";
+import { StageId } from "../../../stage/Stage";
+import { StageElement } from "../../../stage/StageElement";
+
 import { isNil } from "../../../lib/util";
+
+import { GREEN } from "../../../constants";
+
+import { Laser } from "../../Laser/Laser";
+import { PlayerShip } from "../Models/PlayerShip";
 
 export class PlayerLaserMap implements StageElement {
     public readonly id = StageId.LASER;

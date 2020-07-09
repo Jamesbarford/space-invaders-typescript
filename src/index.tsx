@@ -5,14 +5,14 @@ import { Provider } from "react-redux";
 import { store } from "./store";
 import { ScoreConnected } from "./App/Score";
 import { LivesConnected } from "./App/Lives/Lives";
-import { RenderAliensConnected } from "./App/Aliens";
+import { RenderGameConnected } from "./App";
 import "./style.scss";
 
 const App: React.FC = () => (
     <Provider store={store}>
         <ScoreConnected />
         <LivesConnected />
-        <RenderAliensConnected />
+        <RenderGameConnected />
     </Provider>
 );
 

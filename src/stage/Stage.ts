@@ -1,6 +1,6 @@
 import { StageElementMap } from "./StageElementMap";
-import { isNil } from "../../lib/util";
-import { Subscriber, StageSubscribers } from "./models/StageSubscribers";
+import { isNil } from "../lib/util";
+import { StageObservable, StageObservables } from "./StageObservables";
 import { StageEvents } from "./StageEvents";
 
 export const enum StageId {
@@ -17,7 +17,7 @@ export class Stage {
     public readonly context: CanvasRenderingContext2D;
     public readonly stageElementMap: StageElementMap;
     public readonly stageEvents: StageEvents = new StageEvents();
-    private readonly subscribers: StageSubscribers = new StageSubscribers();
+    private readonly observables: StageObservables = new StageObservables();
 
     public constructor(public readonly canvas: HTMLCanvasElement) {
         this.canvas.width = 800;
@@ -32,15 +32,15 @@ export class Stage {
         this.updateCanvas();
     }
 
-    public subscribe(cb: Subscriber): void {
-        this.subscribers.addSubscriber(cb);
+    public registerObserver(observable: StageObservable): void {
+        this.observables.registerObserver(observable);
     }
 
     private updateCanvas = (): void => {
         this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
         this.stageElementMap.update();
-        this.stageEvents.trackPlayerLaser(this.stageElementMap, this.subscribers);
-        this.stageEvents.trackAlienLaser(this.stageElementMap, this.subscribers);
+        this.stageEvents.trackPlayerLaser(this.stageElementMap, this.observables);
+        this.stageEvents.trackAlienLaser(this.stageElementMap, this.observables);
         this.animationId = window.requestAnimationFrame(this.updateCanvas);
     };
 }

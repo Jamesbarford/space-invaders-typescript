@@ -1,5 +1,5 @@
-import { Laser } from "./Laser";
-import { BaseAlien } from "../Characters/BaseAlien";
+import { Laser } from "../../Laser/Laser";
+import { BaseAlien } from "../Models/BaseAlien";
 import { WHITE } from "../../../constants";
 
 export class AlienLaserFire {

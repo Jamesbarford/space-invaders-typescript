@@ -1,21 +1,23 @@
 import * as React from "react";
 import { connect } from "react-redux";
 
-import { Stage } from "./Stage";
-import { IncrementScore } from "../Score/reducer";
-import { Player } from "./Characters/Player";
-import { AlienRow } from "./AlienRow/AlienRow";
-import { Subscriber, Subscription, SubscriptionTypes } from "./models/StageSubscribers";
-import { RemoveLife } from "../Lives/reducer";
+import { Stage } from "../stage/Stage";
+import { StageObservable, StageObservableEvent, StageObserverTypes } from "../stage/StageObservables";
+
+import { IncrementScore } from "./Score/reducer";
+import { RemoveLife } from "./Lives/reducer";
+
+import { AlienRow } from "./Aliens/AlienRow";
+import { Player } from "./Player/Player";
 
 interface MapDispatchToProps {
     incrementScore(score: number): void;
     removeLife(): void;
 }
 
-type RenderAliensProps = MapDispatchToProps;
+type RenderGameProps = MapDispatchToProps;
 
-class RenderAliens extends React.Component<RenderAliensProps> {
+class RenderGame extends React.Component<RenderGameProps> {
     private canvas: React.RefObject<HTMLCanvasElement> = React.createRef();
     private stage: Stage;
 
@@ -27,9 +29,9 @@ class RenderAliens extends React.Component<RenderAliensProps> {
             const alienRows = new AlienRow(gameBounds);
             const player = new Player(gameBounds);
 
-            this.stage.subscribe(this.subscriber);
-            this.stage.subscribe(alienRows.subscriber);
-            this.stage.subscribe(player.subscriber);
+            this.stage.registerObserver(this.observer);
+            this.stage.registerObserver(alienRows.observer);
+            this.stage.registerObserver(player.observer);
 
             this.stage.stageElementMap.addElement(alienRows.alienLaserMap);
             this.stage.stageElementMap.addElement(player);
@@ -42,13 +44,13 @@ class RenderAliens extends React.Component<RenderAliensProps> {
         window.cancelAnimationFrame(this.stage.animationId);
     };
 
-    private subscriber = new Subscriber((subscription: Subscription): void => {
-        switch (subscription.type) {
-            case SubscriptionTypes.ALIEN_KILL:
-                this.props.incrementScore(subscription.alien.scoreValue);
+    private observer = new StageObservable((event: StageObservableEvent): void => {
+        switch (event.type) {
+            case StageObserverTypes.ALIEN_KILL:
+                this.props.incrementScore(event.alien.scoreValue);
                 break;
 
-            case SubscriptionTypes.PLAYER_DEATH:
+            case StageObserverTypes.PLAYER_DEATH:
                 this.props.removeLife();
                 break;
         }
@@ -64,11 +66,11 @@ class RenderAliens extends React.Component<RenderAliensProps> {
     }
 }
 
-export const RenderAliensConnected = connect<null, MapDispatchToProps>(null, dispatch => ({
-    incrementScore(score) {
+export const RenderGameConnected = connect<null, MapDispatchToProps>(null, dispatch => ({
+    incrementScore(score): void {
         dispatch(new IncrementScore(score));
     },
-    removeLife() {
+    removeLife(): void {
         dispatch(new RemoveLife());
     }
-}))(RenderAliens);
+}))(RenderGame);

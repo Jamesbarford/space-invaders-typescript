@@ -1,4 +1,4 @@
-import { StageId } from "../Stage";
+import { StageId } from "./Stage";
 
 export interface StageElement {
     id: StageId;

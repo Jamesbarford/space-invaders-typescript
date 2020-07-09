@@ -1,12 +1,12 @@
-import { StageElement } from "../models/StageElement";
-import { StageId } from "../Stage";
-import { forEach, isNil } from "../../../lib/util";
-import { BaseAlien } from "../Characters/BaseAlien";
-import { Directions } from "../models/Directions";
-import { createAliens } from "../createAliens";
-import { AlienKill, Subscriber, Subscription } from "../models/StageSubscribers";
-import { AlienLaserMap } from "../Laser/AlienLaserMap";
-import { AlienLaserFire } from "../Laser/AlienLaserFire";
+import { StageElement } from "../../stage/StageElement";
+import { StageId } from "../../stage/Stage";
+import { forEach } from "../../lib/util";
+import { BaseAlien } from "./Models/BaseAlien";
+import { createAliens } from "./createAliens";
+import { StageObservable, StageObservableEvent, StageObserverTypes } from "../../stage/StageObservables";
+import { AlienLaserMap } from "./Laser/AlienLaserMap";
+import { AlienLaserFire } from "./Laser/AlienLaserFire";
+import { Directions } from "../../constants";
 
 export class AlienRow implements StageElement {
     public readonly id: StageId = StageId.ALIENS;
@@ -42,24 +42,26 @@ export class AlienRow implements StageElement {
         const randomRowId = ~~(Math.random() * 5);
         const row: Maybe<Array<BaseAlien>> = this.aliens?.[randomRowId];
 
-        if (row) {
-            const randomAlien = ~~(Math.random() * row.length);
-
-            return row?.[randomAlien];
-        }
+        if (row) return row?.[~~(Math.random() * row.length)];
     }
 
-    public subscriber = new Subscriber((subscription: Subscription): void => {
-        if (!(subscription instanceof AlienKill)) return;
+    public observer = new StageObservable((event: StageObservableEvent): void => {
+        switch (event.type) {
+            case StageObserverTypes.ALIEN_KILL: {
+                const row: BaseAlien[] = this.aliens?.[event.rowNumber] || [];
+                const rowIndex = row.findIndex(alien => alien.id === event.alien.id);
 
-        const row = this.aliens[subscription.rowNumber];
-        const rowIndex = row?.findIndex(alien => alien.id === subscription.alien.id);
+                if (rowIndex !== -1) {
+                    row?.splice(rowIndex, 1);
 
-        if (isNil(rowIndex) || rowIndex === -1 || isNil(row)) return void 0;
+                    if (row?.length === 0) delete this.aliens[event.rowNumber];
+                }
+                break;
+            }
 
-        row.splice(rowIndex, 1);
-
-        if (row.length === 0) delete this.aliens[subscription.rowNumber];
+            default:
+                break;
+        }
     });
 
     public update(ctx: CanvasRenderingContext2D): void {
@@ -102,8 +104,8 @@ export class AlienRow implements StageElement {
 
     private lowerRow(ctx: CanvasRenderingContext2D): void {
         forEach(this.aliens, row =>
-            forEach(row, c => {
-                c.draw(ctx, c.x, c.y + 15);
+            forEach(row, baseAlien => {
+                baseAlien.draw(ctx, baseAlien.x, baseAlien.y + 15);
                 // c.incrementFrameSpeed(0.2)
             })
         );

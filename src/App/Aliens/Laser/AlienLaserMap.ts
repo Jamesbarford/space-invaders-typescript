@@ -1,6 +1,6 @@
 import { forEach } from "../../../lib/util";
-import { StageElement } from "../models/StageElement";
-import { StageId } from "../Stage";
+import { StageElement } from "../../../stage/StageElement";
+import { StageId } from "../../../stage/Stage";
 import { AlienLaserFire } from "./AlienLaserFire";
 
 export class AlienLaserMap implements StageElement {

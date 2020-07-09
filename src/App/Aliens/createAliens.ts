@@ -1,9 +1,9 @@
 import { v4 as uuid } from "uuid";
 
-import { EggAlien } from "./Characters/EggAlien";
-import { AlienConstructor, BaseAlien } from "./Characters/BaseAlien";
-import { BottomAlien } from "./Characters/BottomAlien";
-import { MiddleAlien } from "./Characters/MiddleAlien";
+import { EggAlien } from "./Models/EggAlien";
+import { AlienConstructor, BaseAlien } from "./Models/BaseAlien";
+import { BottomAlien } from "./Models/BottomAlien";
+import { MiddleAlien } from "./Models/MiddleAlien";
 import { ORANGE, WHITE, PIXEL_SIZE } from "../../constants";
 
 export function createAliens(): Record<number, Array<BaseAlien>> {

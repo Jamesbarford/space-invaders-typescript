@@ -1,6 +1,6 @@
-import { StageElement } from "./models/StageElement";
+import { StageElement } from "./StageElement";
 import { StageId } from "./Stage";
-import { forEach, get } from "../../lib/util";
+import { forEach, get } from "../lib/util";
 
 export class StageElementMap {
     private stageElementMap: Record<StageId, StageElement> = <Record<StageId, StageElement>>{};

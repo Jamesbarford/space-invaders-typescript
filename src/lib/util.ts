@@ -22,11 +22,6 @@ export function inRange(value: number, min: number, max: number): boolean {
     return value >= min && value <= max;
 }
 
-export function castArray<T>(arg: T | Array<T>): Array<T> {
-    if (isArray(arg)) return arg;
-    return [arg];
-}
-
 export function forEach<T>(arg: Array<T>, cb: (val: T, index: number) => boolean | void): boolean | void;
 export function forEach<T>(
     arg: Dictionary<T>,
